@@ -1,0 +1,66 @@
+﻿@page "/servers/{id:int}"
+
+<h3>Edit Server</h3>
+<br/>
+<br/>
+@if (server is not null)
+{
+    <EditForm Model="server" FormName="formServer" OnSubmit="Submit">
+        @* Submit 핸들러에서 업데이트 할 객체를 인식하기 위한 히든 필드 *@
+        <InputNumber @bind-Value="server.ServerId" hidden=""></InputNumber>
+        
+        <div class="row mb-3">
+            <div class="col-2">
+                <label class="col-form-label">Name</label>
+            </div>
+            <div class="col-6">
+                <InputText @bind-Value="server.Name" class="form-control"></InputText>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-2">
+                <label class="col-form-label">City</label>
+            </div>
+            <div class="col-6">
+                <InputText @bind-Value="server.City" class="form-control"></InputText>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-2">
+                <label class="col-form-label">Online</label>
+            </div>
+            <div class="col-6">
+                <InputCheckbox @bind-Value="server.IsOnline" class="form-check-input"></InputCheckbox>
+            </div>
+        </div>
+        <br>
+        <button class="btn btn-primary" type="submit">Update</button>
+        &nbsp;
+        <a href="/servers" class="btn btn-primary">Close</a>
+    </EditForm>
+}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm] // EditForm이 페이지에 2개 이상일 경우, FormName을 지정해서 핸들링
+    private Server? server { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        // 서버가 null이 아니라면 작업을 건너 뛰도록 ?? 검증 추가 
+        server ??= ServersRepository.GetServerById(this.Id);
+    }
+
+    private void Submit()
+    {
+        if (server is not null)
+        {
+            ServersRepository.UpdateServer(server.ServerId, server);
+        }
+    }
+}
